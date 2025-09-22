@@ -1,6 +1,7 @@
 from rest_framework import authentication, exceptions
 from .auth0_jwt import verify_jwt
 
+
 class Auth0JWTAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         auth_header = request.headers.get("Authorization", "")
