@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from users.models import UserProfile
 from .models import File, FileAccessLog
-from .serializers import FileUploadConfirmSerializer, FileUploadRequestSerializer
+from .serializers import FileUploadConfirmSerializer, FileUploadRequestSerializer, FileDownloadResponseSerializer, FileDownloadRequestSerializer
 
 
 # returns presigned URL for uploading a file
@@ -47,7 +47,7 @@ class GetUploadURLView(APIView):
         })
 
 
-
+# After uploading the file to the presigned URL, the client calls this to confirm upload
 class ConfirmUploadView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -78,3 +78,47 @@ class ConfirmUploadView(APIView):
         )
 
         return Response(FileUploadConfirmSerializer(file_obj).data)
+
+
+# returns presigned URL for downloading a file
+class GetDownloadURLView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = FileDownloadRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        file_id = serializer.validated_data["file_id"]
+
+        # Validate ownership (later extend to shared links)
+        try:
+            file_obj = File.objects.get(id=file_id, owner_id=request.user, uploaded=True)
+        except File.DoesNotExist:
+            return Response({"detail": "File not found"}, status=404)
+
+        # Generate presigned GET URL
+        s3_client = Config.s3_client
+        presigned_url = s3_client.generate_presigned_url(
+            ClientMethod="get_object",
+            Params={
+                "Bucket": Config.MINIO_BUCKET_NAME,
+                "Key": file_obj.file_path,
+            },
+            ExpiresIn=3600,
+        )
+
+        # Log download
+        FileAccessLog.objects.create(
+            file_id=file_obj,
+            user_id=request.user,
+            action="DOWNLOAD",
+            ip_address=request.META.get("REMOTE_ADDR"),
+            user_agent=request.META.get("HTTP_USER_AGENT", ""),
+            timestamp=now(),
+        )
+
+        response_data = {
+            "download_url": presigned_url,
+            "file_name": file_obj.file_name,
+            "file_size": file_obj.file_size,
+        }
+        return Response(FileDownloadResponseSerializer(response_data).data)
