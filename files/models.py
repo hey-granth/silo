@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import UserProfile
+from config import Config
 
 
 class File(models.Model):
@@ -12,6 +13,7 @@ class File(models.Model):
     uploaded = models.BooleanField(default=False)
     # to avoid duplicate uploads
     checksum = models.CharField(max_length=64, db_index=True)  # SHA-256 checksum
+    file_type = models.CharField(max_length=50, null=True, blank=True, choices=Config.FILE_TYPE_CHOICES)  # MIME type
 
     def __str__(self):
         return f"{self.file_name} ({self.file_size} bytes)"
@@ -34,7 +36,7 @@ class FileChunk(models.Model):
         return f"Chunk {self.chunk_index} of {self.file_id}"
 
     class Meta:
-        unique_together = ('file', 'chunk_index')
+        unique_together = ('file_id', 'chunk_index')
 
 
 class FileAccessLog(models.Model):
