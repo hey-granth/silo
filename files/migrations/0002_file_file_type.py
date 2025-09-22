@@ -4,15 +4,28 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('files', '0001_initial'),
+        ("files", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='file',
-            name='file_type',
-            field=models.CharField(blank=True, choices=[('image/jpeg', 'JPEG Image'), ('image/png', 'PNG Image'), ('application/pdf', 'PDF Document'), ('text/plain', 'Plain Text'), ('application/zip', 'ZIP Archive'), ('video/mp4', 'MP4 Video'), ('audio/mpeg', 'MP3 Audio'), ('application/vnd.ms-excel', 'Excel Spreadsheet')], max_length=50, null=True),
+            model_name="file",
+            name="file_type",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("image/jpeg", "JPEG Image"),
+                    ("image/png", "PNG Image"),
+                    ("application/pdf", "PDF Document"),
+                    ("text/plain", "Plain Text"),
+                    ("application/zip", "ZIP Archive"),
+                    ("video/mp4", "MP4 Video"),
+                    ("audio/mpeg", "MP3 Audio"),
+                    ("application/vnd.ms-excel", "Excel Spreadsheet"),
+                ],
+                max_length=50,
+                null=True,
+            ),
         ),
     ]

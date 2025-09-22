@@ -18,8 +18,12 @@ class Auth0JWTAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed("Token missing subject claim")
         # Optionally fetch or create a local Django user to represent this
         from django.contrib.auth import get_user_model
+
         User = get_user_model()
-        user, _ = User.objects.get_or_create(username=user_id, defaults={
-            "email": payload.get("email", ""),
-        })
+        user, _ = User.objects.get_or_create(
+            username=user_id,
+            defaults={
+                "email": payload.get("email", ""),
+            },
+        )
         return (user, None)

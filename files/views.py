@@ -6,7 +6,12 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from users.models import UserProfile
 from .models import File, FileAccessLog
-from .serializers import FileUploadConfirmSerializer, FileUploadRequestSerializer, FileDownloadResponseSerializer, FileDownloadRequestSerializer
+from .serializers import (
+    FileUploadConfirmSerializer,
+    FileUploadRequestSerializer,
+    FileDownloadResponseSerializer,
+    FileDownloadRequestSerializer,
+)
 
 
 # returns presigned URL for uploading a file
@@ -22,9 +27,9 @@ class GetUploadURLView(APIView):
         file_obj = File.objects.create(
             id=uuid.uuid4(),
             owner_id=request.user,  # mapped to UserProfile
-            file_name=data['file_name'],
-            file_size=data['file_size'],
-            checksum=data['checksum'],
+            file_name=data["file_name"],
+            file_size=data["file_size"],
+            checksum=data["checksum"],
             file_path=f"uploads/{request.user.id}/{uuid.uuid4()}_{data['file_name']}",
         )
 
@@ -35,16 +40,18 @@ class GetUploadURLView(APIView):
             Params={
                 "Bucket": Config.MINIO_BUCKET_NAME,
                 "Key": file_obj.file_path,
-                "ContentType": data['file_type'],
+                "ContentType": data["file_type"],
             },
             ExpiresIn=3600,
         )
 
-        return Response({
-            "file_id": str(file_obj.id),
-            "upload_url": presigned_url,
-            "file_path": file_obj.file_path,
-        })
+        return Response(
+            {
+                "file_id": str(file_obj.id),
+                "upload_url": presigned_url,
+                "file_path": file_obj.file_path,
+            }
+        )
 
 
 # After uploading the file to the presigned URL, the client calls this to confirm upload
@@ -91,7 +98,9 @@ class GetDownloadURLView(APIView):
 
         # Validate ownership (later extend to shared links)
         try:
-            file_obj = File.objects.get(id=file_id, owner_id=request.user, uploaded=True)
+            file_obj = File.objects.get(
+                id=file_id, owner_id=request.user, uploaded=True
+            )
         except File.DoesNotExist:
             return Response({"detail": "File not found"}, status=404)
 

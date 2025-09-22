@@ -9,10 +9,12 @@ class MyProtectedView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request) -> Response:
-        return Response({
-            "user_id": request.user.username,
-            "email": request.user.email,
-        })
+        return Response(
+            {
+                "user_id": request.user.username,
+                "email": request.user.email,
+            }
+        )
 
 
 class UserProfileView(APIView):

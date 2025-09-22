@@ -5,68 +5,112 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('users', '0001_initial'),
+        ("users", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='File',
+            name="File",
             fields=[
-                ('id', models.UUIDField(primary_key=True, serialize=False)),
-                ('file_path', models.CharField(max_length=255)),
-                ('file_name', models.CharField(max_length=255)),
-                ('file_size', models.BigIntegerField()),
-                ('uploaded_at', models.DateTimeField(auto_now_add=True)),
-                ('uploaded', models.BooleanField(default=False)),
-                ('checksum', models.CharField(db_index=True, max_length=64)),
-                ('owner_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='files', to='users.userprofile')),
+                ("id", models.UUIDField(primary_key=True, serialize=False)),
+                ("file_path", models.CharField(max_length=255)),
+                ("file_name", models.CharField(max_length=255)),
+                ("file_size", models.BigIntegerField()),
+                ("uploaded_at", models.DateTimeField(auto_now_add=True)),
+                ("uploaded", models.BooleanField(default=False)),
+                ("checksum", models.CharField(db_index=True, max_length=64)),
+                (
+                    "owner_id",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="files",
+                        to="users.userprofile",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='FileAccessLog',
+            name="FileAccessLog",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('ip_address', models.GenericIPAddressField(blank=True, null=True)),
-                ('user_agent', models.CharField(blank=True, max_length=255, null=True)),
-                ('timestamp', models.DateTimeField(auto_now_add=True)),
-                ('token', models.CharField(blank=True, max_length=255, null=True)),
-                ('file_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='access_logs', to='files.file')),
-                ('user_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='file_access_logs', to='users.userprofile')),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("ip_address", models.GenericIPAddressField(blank=True, null=True)),
+                ("user_agent", models.CharField(blank=True, max_length=255, null=True)),
+                ("timestamp", models.DateTimeField(auto_now_add=True)),
+                ("token", models.CharField(blank=True, max_length=255, null=True)),
+                (
+                    "file_id",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="access_logs",
+                        to="files.file",
+                    ),
+                ),
+                (
+                    "user_id",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="file_access_logs",
+                        to="users.userprofile",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='SharedFileLink',
+            name="SharedFileLink",
             fields=[
-                ('id', models.UUIDField(primary_key=True, serialize=False)),
-                ('token', models.CharField(db_index=True, max_length=255, unique=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('expires_at', models.DateTimeField(blank=True, null=True)),
-                ('max_downloads', models.IntegerField(blank=True, null=True)),
-                ('download_count', models.IntegerField(default=0)),
-                ('password_hash', models.CharField(blank=True, max_length=255, null=True)),
-                ('file_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='shared_links', to='files.file')),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='shared_links', to='users.userprofile')),
+                ("id", models.UUIDField(primary_key=True, serialize=False)),
+                ("token", models.CharField(db_index=True, max_length=255, unique=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("expires_at", models.DateTimeField(blank=True, null=True)),
+                ("max_downloads", models.IntegerField(blank=True, null=True)),
+                ("download_count", models.IntegerField(default=0)),
+                (
+                    "password_hash",
+                    models.CharField(blank=True, max_length=255, null=True),
+                ),
+                (
+                    "file_id",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="shared_links",
+                        to="files.file",
+                    ),
+                ),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="shared_links",
+                        to="users.userprofile",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='FileChunk',
+            name="FileChunk",
             fields=[
-                ('id', models.UUIDField(primary_key=True, serialize=False)),
-                ('chunk_index', models.IntegerField()),
-                ('chunk_size', models.BigIntegerField()),
-                ('uploaded_at', models.DateTimeField(auto_now_add=True)),
-                ('checksum', models.CharField(max_length=64)),
-                ('storage_path', models.CharField(max_length=255)),
-                ('uploaded', models.BooleanField(default=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('file_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chunks', to='files.file')),
+                ("id", models.UUIDField(primary_key=True, serialize=False)),
+                ("chunk_index", models.IntegerField()),
+                ("chunk_size", models.BigIntegerField()),
+                ("uploaded_at", models.DateTimeField(auto_now_add=True)),
+                ("checksum", models.CharField(max_length=64)),
+                ("storage_path", models.CharField(max_length=255)),
+                ("uploaded", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "file_id",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="chunks",
+                        to="files.file",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('file_id', 'chunk_index')},
+                "unique_together": {("file_id", "chunk_index")},
             },
         ),
     ]

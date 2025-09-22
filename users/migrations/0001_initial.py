@@ -4,28 +4,48 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='UserProfile',
+            name="UserProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('auth0_id', models.CharField(db_index=True, max_length=100, unique=True)),
-                ('plan', models.CharField(choices=[('free', 'Free'), ('pro', 'Pro'), ('enterprise', 'Enterprise')], default='free', max_length=20)),
-                ('email', models.EmailField(max_length=254, unique=True)),
-                ('name', models.CharField(blank=True, max_length=100)),
-                ('bio', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('storage_used', models.BigIntegerField(default=0)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "auth0_id",
+                    models.CharField(db_index=True, max_length=100, unique=True),
+                ),
+                (
+                    "plan",
+                    models.CharField(
+                        choices=[
+                            ("free", "Free"),
+                            ("pro", "Pro"),
+                            ("enterprise", "Enterprise"),
+                        ],
+                        default="free",
+                        max_length=20,
+                    ),
+                ),
+                ("email", models.EmailField(max_length=254, unique=True)),
+                ("name", models.CharField(blank=True, max_length=100)),
+                ("bio", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("storage_used", models.BigIntegerField(default=0)),
             ],
             options={
-                'verbose_name': 'User Profile',
+                "verbose_name": "User Profile",
             },
         ),
     ]

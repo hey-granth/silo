@@ -5,6 +5,7 @@ import boto3
 
 load_dotenv()
 
+
 class Config:
     AUTH0_ALGORITHMS: list[str] = ["RS256"]
     AUTH0_DOMAIN: str = os.getenv("AUTH0_DOMAIN")
