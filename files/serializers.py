@@ -28,3 +28,18 @@ class FileDownloadResponseSerializer(serializers.Serializer):
     download_url = serializers.URLField()
     file_name = serializers.CharField()
     file_size = serializers.IntegerField()
+
+
+class CreateSharedLinkSerializer(serializers.Serializer):
+    file_id = serializers.UUIDField()
+    expires_at = serializers.DateTimeField(required=False)
+    max_downloads = serializers.IntegerField(required=False)
+    password = serializers.CharField(required=False, allow_blank=True)
+    permission = serializers.ChoiceField(choices=["DOWNLOAD", "VIEW"])
+
+
+class SharedLinkResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SharedFileLink
+        fields = ["token", "expires_at", "download_count"]
+        read_only_fields = fields
