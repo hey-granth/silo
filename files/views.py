@@ -33,16 +33,11 @@ class GetUploadURLView(APIView):
             file_path=f"uploads/{request.user.id}/{uuid.uuid4()}_{data['file_name']}",
         )
 
-        # Generate presigned PUT URL (MinIO / S3 compatible)
-        s3_client = Config.s3_client
-        presigned_url = s3_client.generate_presigned_url(
-            ClientMethod="put_object",
-            Params={
-                "Bucket": Config.MINIO_BUCKET_NAME,
-                "Key": file_obj.file_path,
-                "ContentType": data["file_type"],
-            },
-            ExpiresIn=3600,
+        # Generate presigned PUT URL (MinIO)
+        presigned_url = Config.s3_client.presigned_put_object(
+            Config.MINIO_BUCKET_NAME,
+            file_obj.file_path,
+            expires=3600,
         )
 
         return Response(
@@ -96,7 +91,6 @@ class GetDownloadURLView(APIView):
         serializer.is_valid(raise_exception=True)
         file_id = serializer.validated_data["file_id"]
 
-        # Validate ownership (later extend to shared links)
         try:
             file_obj = File.objects.get(
                 id=file_id, owner_id=request.user, uploaded=True
@@ -104,15 +98,11 @@ class GetDownloadURLView(APIView):
         except File.DoesNotExist:
             return Response({"detail": "File not found"}, status=404)
 
-        # Generate presigned GET URL
-        s3_client = Config.s3_client
-        presigned_url = s3_client.generate_presigned_url(
-            ClientMethod="get_object",
-            Params={
-                "Bucket": Config.MINIO_BUCKET_NAME,
-                "Key": file_obj.file_path,
-            },
-            ExpiresIn=3600,
+        # Generate presigned GET URL (MinIO)
+        presigned_url = Config.s3_client.presigned_get_object(
+            Config.MINIO_BUCKET_NAME,
+            file_obj.file_path,
+            expires=3600,
         )
 
         # Log download

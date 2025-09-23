@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-import boto3
+from minio import Minio
 
 
 load_dotenv()
@@ -20,13 +20,14 @@ class Config:
     MINIO_ACCESS_KEY: str = os.getenv("MINIO_ACCESS_KEY")
     MINIO_SECRET_KEY: str = os.getenv("MINIO_SECRET_KEY")
     MINIO_BUCKET_NAME: str = os.getenv("MINIO_BUCKET_NAME")
-    s3_client = boto3.client(
-        "s3",
-        endpoint_url=MINIO_ENDPOINT,
-        aws_access_key_id=MINIO_ACCESS_KEY,
-        aws_secret_access_key=MINIO_SECRET_KEY,
-        region_name="us-east-1",  # not for minio, but required by boto3
+    MINIO_SECURE: bool = os.getenv("MINIO_SECURE", "True").lower() in ("true", "1", "t")
+    s3_client = Minio(
+        MINIO_ENDPOINT.replace("http://", "").replace("https://", ""),
+        access_key=MINIO_ACCESS_KEY,
+        secret_key=MINIO_SECRET_KEY,
+        secure=MINIO_SECURE,
     )
+    # Implemented Minio official sdk instead of boto3 for simplicity, as we only need basic S3 operations. Also, Minio sdk is more lightweight. No extra overhead and dependencies.
 
     FILE_TYPE_CHOICES: list[tuple[str, str]] = [
         ("image/jpeg", "JPEG Image"),
